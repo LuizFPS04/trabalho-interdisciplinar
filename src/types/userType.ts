@@ -1,3 +1,7 @@
+import { Result } from "express-validator";
+import { Quiz } from "./quizType";
+import { Ranking } from "./rankingType";
+
 export interface User {
     id: number;
     nickname: string;
@@ -7,8 +11,8 @@ export interface User {
     birth: Date;
     createdAt?: Date;
     updatedAt?: Date;
-    /* quizzes?: QuizType[];
-    results?: ResultType[];
-    Ranking?: RankingType[]; */
+    quizzes?: Quiz[];
+    results?: Result[];
+    Ranking?: Ranking[];
   };
   
