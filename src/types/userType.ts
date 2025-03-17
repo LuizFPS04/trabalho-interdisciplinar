@@ -10,8 +10,8 @@ export interface User {
     name: string;
     birth: Date;
     role?: string;
-    createdAt?: Date;
-    updatedAt?: Date;
+    createdAt?: Date | null;
+    updatedAt?: Date | null;
     quizzes?: Quiz[];
     results?: Result[];
     Ranking?: Ranking[];

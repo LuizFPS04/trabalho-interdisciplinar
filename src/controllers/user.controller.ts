@@ -7,7 +7,7 @@ export async function createUser(req: Request, res: Response): Promise<any> {
         const { name, email, nickname, password, birth, role } = req.body;
         const userType = role || 'normal';
 
-        const newUser = UserFactory.createUser(userType, { name, email, nickname, password, birth, role });
+        const newUser = UserFactory.createUser(userType, { name, email, nickname, password, birth, role, createdAt: null, updatedAt: null });
 
         const createdUser = await userService.createUser(newUser);
 

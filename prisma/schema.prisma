@@ -21,8 +21,8 @@ model User {
   name      String
   birth     DateTime
   role      String?
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  createdAt DateTime? @default(now())
+  updatedAt DateTime? @updatedAt
 
   quizzes Quiz[]
   results Result[]
