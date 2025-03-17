@@ -7,28 +7,47 @@ export interface Quiz {
     title: string;
     theme: string;
     description: string;
-    questions: Question[];
-    createdAt?: Date;
-    updatedAt?: Date;
+    createdAt: Date;
+    updatedAt: Date;
+    questions?: Question[];
     users?: User[];
     results?: Result[];
     rankings?: Ranking[];
-};
+}
 
 export interface Question {
     id: number;
     content: string;
-    answers: Answer[];
-    createdAt?: Date;
-    updatedAt?: Date;
-    quiz?: Quiz;
-};
+    createdAt: Date; // Tornar obrigatório
+    updatedAt: Date; // Tornar obrigatório
+    quizId: number; // Adicionar quizId para relação com Quiz
+    quiz?: Quiz; // Relação com Quiz
+    answers?: Answer[]; // Relação com Answer
+}
 
 export interface Answer {
     id: number;
     content: string;
     isCorrect: boolean;
-    createdAt?: Date;
-    updatedAt?: Date;
-    question?: Question;
-};
+    createdAt: Date; // Tornar obrigatório
+    updatedAt: Date; // Tornar obrigatório
+    questionId: number; // Adicionar questionId para relação com Question
+    question?: Question; // Relação com Question
+}
+
+export interface AnswerData {
+    content: string;
+    isCorrect: boolean;
+}
+
+export interface QuestionData {
+    content: string;
+    answers: AnswerData[];
+}
+
+export interface QuizData {
+    title: string;
+    theme: string;
+    description: string;
+    questions: QuestionData[];
+}

@@ -1,6 +1,6 @@
 import bcrypt from "bcryptjs";
 import { prismaClient } from "../config/db";
-import { User } from "../types/userType";
+import { User } from "@prisma/client";
 
 export async function getAllUsers(): Promise<User[]> {
     return prismaClient.user.findMany();
@@ -30,6 +30,17 @@ export async function getUserByNickname(nickname: string): Promise<User | null> 
     });
 }
 
+export async function getUserByIdWithDetails(id: number): Promise<User | null> {
+    return prismaClient.user.findUnique({
+        where: { id },
+        include: {
+            quizzes: true,
+            Ranking: true,
+            results: true
+        },
+    });
+}
+
 export async function createUser(user: User): Promise<User> {
     return prismaClient.user.create({
         data: user,
@@ -55,4 +66,4 @@ export async function deleteUser(id: number): Promise<User> {
 
 export async function comparePassword(password: string, hashedPassword: string): Promise<boolean> {
     return bcrypt.compare(password, hashedPassword);
-  }
+}

@@ -27,6 +27,7 @@ class AdminUser implements User {
         this.nickname = userData.nickname!;
         this.password = userData.password!;
         this.birth = userData.birth!;
+        this.role = userData.role!;
     }
 }
 
@@ -46,5 +47,6 @@ class NormalUser implements User {
         this.nickname = userData.nickname!;
         this.password = userData.password!;
         this.birth = userData.birth!;
+        this.role = userData.role!;
     }
 }

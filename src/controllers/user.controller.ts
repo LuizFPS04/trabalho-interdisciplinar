@@ -7,7 +7,7 @@ export async function createUser(req: Request, res: Response): Promise<any> {
         const { name, email, nickname, password, birth, role } = req.body;
         const userType = role || 'normal';
 
-        const newUser = UserFactory.createUser(userType, { name, email, nickname, password, birth });
+        const newUser = UserFactory.createUser(userType, { name, email, nickname, password, birth, role });
 
         const createdUser = await userService.createUser(newUser);
 
@@ -38,6 +38,27 @@ export async function getAllUsers(req: Request, res: Response): Promise<any> {
             message: 'Users fetched successfully',
             data: users,
         });
+    } catch (error: any) {
+        console.error(error);
+        return res.status(error.status || 500).send({
+            success: false,
+            message: error.message || 'Internal server error',
+        });
+    }
+}
+
+export async function getUserWithDetails(req: Request, res: Response): Promise<any> {
+    try {
+        const field: any = req.query.email || req.query.nickname;
+
+        const user = await userService.getUserWithDetails(field);
+
+        return res.status(200).send({
+            success: true,
+            message: 'User fetched successfully',
+            data: user,
+        });
+
     } catch (error: any) {
         console.error(error);
         return res.status(error.status || 500).send({
@@ -118,7 +139,7 @@ export async function getUserByNickname(req: Request, res: Response): Promise<an
 
 export async function updateUser(req: Request, res: Response): Promise<any> {
     try {
-        const field = req.params.email || req.params.nickname;
+        const field: any = req.query.email || req.query.nickname;
         const { name, email, nickname, password, role } = req.body;
         const userType = role || 'normal';
 
@@ -131,6 +152,26 @@ export async function updateUser(req: Request, res: Response): Promise<any> {
             message: 'User updated successfully',
             data: user,
         });
+    } catch (error: any) {
+        console.error(error);
+        return res.status(error.status || 500).send({
+            success: false,
+            message: error.message || 'Internal server error',
+        });
+    }
+}
+
+export async function deleteUser(req: Request, res: Response): Promise<any> {
+    try {
+        const field: any = req.query.email || req.query.nickname;
+
+        const user = await userService.deleteUser(field);
+
+        return res.status(200).send({
+            success: true,
+            message: 'User deleted successfully',
+            data: user,
+        }); 
     } catch (error: any) {
         console.error(error);
         return res.status(error.status || 500).send({

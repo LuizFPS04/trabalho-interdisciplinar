@@ -1,9 +1,20 @@
 import { prismaClient } from "../config/db";
-import { Ranking } from "../types/rankingType";
+import { Ranking } from "@prisma/client";
 
 export async function getAllRankings(): Promise<Ranking[]> {
     return prismaClient.ranking.findMany();
 }
+
+export async function getRankingWithUserAndQuiz(id: number): Promise<Ranking | null> {
+    return prismaClient.ranking.findUnique({
+        where: { id },
+        include: {
+            user: true,
+            quiz: true,
+        },
+    });
+}
+
 
 export async function getRankingById(id: number): Promise<Ranking | null> {
     return prismaClient.ranking.findUnique({

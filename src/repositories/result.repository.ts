@@ -1,51 +1,61 @@
 import { prismaClient } from "../config/db";
-import { Ranking } from "../types/rankingType";
+import { Result } from "@prisma/client";
 
-export async function getAllRankings(): Promise<Ranking[]> {
-    return prismaClient.ranking.findMany();
+export async function getAllResults(): Promise<Result[]> {
+    return prismaClient.result.findMany();
 }
 
-export async function getRankingById(id: number): Promise<Ranking | null> {
-    return prismaClient.ranking.findUnique({
+export async function getResultsWithUserAndQuiz(): Promise<Result[]> {
+    return prismaClient.result.findMany({
+        include: {
+            user: true,
+            quiz: true,
+        },
+    });
+}
+
+
+export async function getResultById(id: number): Promise<Result | null> {
+    return prismaClient.result.findUnique({
         where: {
             id,
         },
     });
 }
 
-export async function getRankingByUserId(userId: number): Promise<Ranking[]> {
-    return prismaClient.ranking.findMany({
+export async function getResultByUserId(userId: number): Promise<Result[]> {
+    return prismaClient.result.findMany({
         where: {
             userId,
         },
     });
 }
 
-export async function getRankingByQuizId(quizId: number): Promise<Ranking[]> {
-    return prismaClient.ranking.findMany({
+export async function getResultByQuizId(quizId: number): Promise<Result[]> {
+    return prismaClient.result.findMany({
         where: {
             quizId,
         },
     });
 }
 
-export async function createRanking(ranking: Ranking): Promise<Ranking> {
-    return prismaClient.ranking.create({
-        data: ranking,
+export async function createResult(result: Result): Promise<Result> {
+    return prismaClient.result.create({
+        data: result,
     });
 }
 
-export async function updateRanking(id: number, ranking: Ranking): Promise<Ranking> {
-    return prismaClient.ranking.update({
+export async function updateResult(id: number, result: Result): Promise<Result> {
+    return prismaClient.result.update({
         where: {
             id,
         },
-        data: ranking,
+        data: result,
     });
 }
 
-export async function deleteRanking(id: number): Promise<Ranking> {
-    return prismaClient.ranking.delete({
+export async function deleteResult(id: number): Promise<Result> {
+    return prismaClient.result.delete({
         where: {
             id,
         },

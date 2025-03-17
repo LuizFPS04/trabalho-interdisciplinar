@@ -1,8 +1,17 @@
 import { prismaClient } from "../config/db";
-import { Quiz, Question, Answer } from "../types/quizType";
+import { Quiz, Question, Answer } from '@prisma/client';
+import { QuizData } from "../types/quizType";
 
 export async function getAllQuizzes(): Promise<Quiz[]> {
-    return prismaClient.quiz.findMany();
+    return prismaClient.quiz.findMany({
+        include: {
+            questions: {
+                include: {
+                    answers: true,
+                },
+            },
+        },
+    });
 }
 
 export async function getQuizById(id: number): Promise<Quiz | null> {
@@ -10,6 +19,13 @@ export async function getQuizById(id: number): Promise<Quiz | null> {
         where: {
             id,
         },
+        include: {
+            questions: {
+                include: {
+                    answers: true,
+                },
+            },
+        }
     });
 }
 
@@ -17,6 +33,41 @@ export async function getQuizByTheme(theme: string): Promise<Quiz[] | null> {
     return prismaClient.quiz.findMany({
         where: {
             theme,
+        },
+        include: {
+            questions: {
+                include: {
+                    answers: true,
+                },
+            },
+        }
+    });
+}
+
+export async function getQuizWithQuestionsAndAnswers(id: number): Promise<Quiz | null> {
+    return prismaClient.quiz.findUnique({
+        where: { id },
+        include: {
+            questions: {
+                include: {
+                    answers: true,
+                },
+            },
+            users: true,
+        },
+    });
+}
+
+export async function getQuizByThemeWithQuestionsAndAnswers(theme: string): Promise<Quiz[] | null> {
+    return prismaClient.quiz.findMany({
+        where: { theme },
+        include: {
+            questions: {
+                include: {
+                    answers: true,
+                },
+            },
+            users: true,
         },
     });
 }
@@ -118,6 +169,34 @@ export async function deleteAnswer(id: number): Promise<Answer> {
     return prismaClient.answer.delete({
         where: {
             id,
+        },
+    });
+}
+
+export async function createQuizWithQuestionsAndAnswers(quizData: QuizData): Promise<Quiz> {
+    return prismaClient.quiz.create({
+        data: {
+            title: quizData.title,
+            theme: quizData.theme,
+            description: quizData.description,
+            questions: {
+                create: quizData.questions.map(question => ({
+                    content: question.content,
+                    answers: {
+                        create: question.answers.map(answer => ({
+                            content: answer.content, // Usando o campo `content` conforme o schema
+                            isCorrect: answer.isCorrect,
+                        })),
+                    },
+                })),
+            },
+        },
+        include: {
+            questions: {
+                include: {
+                    answers: true,
+                },
+            },
         },
     });
 }

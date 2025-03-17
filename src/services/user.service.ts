@@ -1,5 +1,5 @@
 import * as userRepository from "../repositories/user.repository";
-import { User } from "../types/userType";
+import { User } from "@prisma/client";
 
 export async function getAllUsers(): Promise<User[]> {
     return userRepository.getAllUsers();
@@ -15,6 +15,21 @@ export async function getUserByMail(email: string): Promise<User | null> {
 
 export async function getUserByNickname(nickname: string): Promise<User | null> {
     return userRepository.getUserByNickname(nickname);
+}
+
+export async function getUserWithDetails(field: string): Promise<User | null> {
+    let searchUser: User | null = await userRepository.getUserByMail(field);
+
+    if (!searchUser) {
+        searchUser = await userRepository.getUserByNickname(field);
+        if (!searchUser) {
+            throw new Error("User not found");
+        }
+    }
+
+    const id: number = searchUser.id;
+
+    return userRepository.getUserByIdWithDetails(id);
 }
 
 export async function createUser(user: User): Promise<User> {

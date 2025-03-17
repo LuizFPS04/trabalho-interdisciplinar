@@ -9,6 +9,7 @@ export interface User {
     password: string;
     name: string;
     birth: Date;
+    role?: string;
     createdAt?: Date;
     updatedAt?: Date;
     quizzes?: Quiz[];
