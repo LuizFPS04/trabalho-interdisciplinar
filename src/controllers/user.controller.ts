@@ -126,7 +126,7 @@ export async function getUserByMail(req: Request, res: Response): Promise<any> {
 
 export async function getUserByNickname(req: Request, res: Response): Promise<any> {
     try {
-        const {nickname} = req.params;
+        const nickname = req.query.nickname as string;
         const user = await userService.getUserByNickname(nickname);
 
         console.log(user)

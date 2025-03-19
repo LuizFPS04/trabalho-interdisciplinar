@@ -6,7 +6,7 @@ const JWT_SECRET = process.env.JWT_SECRET || 'your_jwt_secret';
 interface JwtPayload {
   id: number;
   email: string;
-  role?: string;
+  role: string;
 }
 
 export function authMiddleware(req: Request, res: Response, next: NextFunction): any {
@@ -18,7 +18,10 @@ export function authMiddleware(req: Request, res: Response, next: NextFunction):
 
   try {
     const decoded = jwt.verify(token, JWT_SECRET) as JwtPayload;
-    req.user = decoded; // Adicionado corretamente ao objeto Request
+    
+    console.log(decoded)
+
+    req.user = decoded;
     next();
   } catch (error) {
     console.error('Erro na autenticação:', error);

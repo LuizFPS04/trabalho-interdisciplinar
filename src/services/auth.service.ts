@@ -11,7 +11,7 @@ if (!JWT_SECRET) {
 
 // Gera o token JWT
 function generateToken(user: User): string {
-  return jwt.sign({ id: user.id, email: user.email }, JWT_SECRET, {
+  return jwt.sign({ id: user.id, email: user.email, role: user.role }, JWT_SECRET, {
     expiresIn: '24h',
   });
 }
@@ -19,11 +19,10 @@ function generateToken(user: User): string {
 export async function authenticateUser(email: string, password: string): Promise<string> {
   // Busca o usuário no repositório
   const user = await userRepository.getUserByMail(email);
+
   if (!user) {
     throw new Error('Usuário não encontrado');
   }
-
-  console.log(user)
 
   // Compara a senha fornecida com a senha armazenada
   const isPasswordCorrect = await userRepository.comparePassword(password, user.password);
