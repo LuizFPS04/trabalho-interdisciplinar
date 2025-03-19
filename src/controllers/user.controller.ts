@@ -4,6 +4,7 @@ import { Request, Response } from 'express';
 
 export async function createUser(req: Request, res: Response): Promise<any> {
     try {
+
         const { name, email, nickname, password, birth, role } = req.body;
         
         const birthDate = new Date(birth);
@@ -22,7 +23,10 @@ export async function createUser(req: Request, res: Response): Promise<any> {
         const createdUser = await userService.createUser(newUser);
 
         if (!createdUser) {
-            throw new Error('User not created');
+            return res.status(400).send({
+                success: false,
+                message: 'Failed to create user',
+            });
         }
 
         return res.status(201).send({
@@ -43,6 +47,13 @@ export async function getAllUsers(req: Request, res: Response): Promise<any> {
     try {
         const users = await userService.getAllUsers();
 
+        if (!users) {
+            return res.status(404).send({
+                success: false,
+                message: 'No users found',
+            });
+        }
+
         return res.status(200).send({
             success: true,
             message: 'Users fetched successfully',
@@ -62,6 +73,13 @@ export async function getUserWithDetails(req: Request, res: Response): Promise<a
         const field: any = req.query.email || req.query.nickname;
 
         const user = await userService.getUserWithDetails(field);
+
+        if (!user) {
+            return res.status(404).send({
+                success: false,
+                message: `User not found with ${field}`,
+            });
+        }
 
         return res.status(200).send({
             success: true,
@@ -84,7 +102,10 @@ export async function getUserById(req: Request, res: Response): Promise<any> {
         const user = await userService.getUserById(Number(id));
 
         if (!user) {
-            throw new Error('User not found');
+            return res.status(404).send({
+                success: false,
+                message: 'User not found',
+            });
         }
 
         return res.status(200).send({
@@ -107,7 +128,10 @@ export async function getUserByMail(req: Request, res: Response): Promise<any> {
         const user = await userService.getUserByMail(email);
 
         if (!user) {
-            throw new Error('User not found');
+            return res.status(404).send({
+                success: false,
+                message: 'User not found',
+            });
         }
 
         return res.status(200).send({
@@ -129,10 +153,11 @@ export async function getUserByNickname(req: Request, res: Response): Promise<an
         const nickname = req.query.nickname as string;
         const user = await userService.getUserByNickname(nickname);
 
-        console.log(user)
-
         if (!user) {
-            throw new Error('User not found');
+            return res.status(404).send({
+                success: false,
+                message: 'User not found',
+            });
         }
 
         return res.status(200).send({
@@ -159,6 +184,13 @@ export async function updateUser(req: Request, res: Response): Promise<any> {
 
         const user = await userService.updateUser(field, updatedUser);
 
+        if (!user) {
+            return res.status(404).send({
+                success: false,
+                message: 'User not found',
+            });
+        }
+
         return res.status(200).send({
             success: true,
             message: 'User updated successfully',
@@ -178,6 +210,13 @@ export async function deleteUser(req: Request, res: Response): Promise<any> {
         const field: any = req.query.email || req.query.nickname;
 
         const user = await userService.deleteUser(field);
+
+        if (!user) {
+            return res.status(404).send({
+                success: false,
+                message: 'User not found',
+            });
+        }
 
         return res.status(200).send({
             success: true,

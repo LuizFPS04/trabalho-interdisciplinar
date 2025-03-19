@@ -42,6 +42,14 @@ export async function createQuestion(question: Question): Promise<Question> {
     return quizRepository.createQuestion(question);
 }
 
+export async function updateQuestion(id: number, question: Question): Promise<Question> {
+    return quizRepository.updateQuestion(id, question);
+}
+
+export async function getQuestionById(id: number): Promise<Question | null> {
+    return quizRepository.getQuestionById(id);
+}
+
 export async function getQuestionsByQuizId(id: number): Promise<Question[]> {
     return quizRepository.getQuestionsByQuizId(id);
 }
@@ -52,6 +60,14 @@ export async function deleteQuestion(id: number): Promise<Question> {
 
 export async function createAnswer(answer: Answer): Promise<Answer> {
     return quizRepository.createAnswer(answer);
+}
+
+export async function updateAnswer(id: number, answer: Answer): Promise<Answer> {
+    return quizRepository.updateAnswer(id, answer);
+}
+
+export async function getAnswerById(id: number): Promise<Answer | null> {
+    return quizRepository.getAnswerById(id);
 }
 
 export async function getAnswersByQuestionId(id: number): Promise<Answer[]> {

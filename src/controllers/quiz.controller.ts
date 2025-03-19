@@ -9,7 +9,10 @@ export async function createCompleteQuiz(req: Request, res: Response): Promise<a
         const createdQuiz = await quizService.createQuizWithQuestionsAndAnswers(body);
 
         if (!createdQuiz) {
-            throw new Error('Quiz not created');
+            return res.status(400).send({
+                success: false,
+                message: 'Quiz not created: invalid data or service error',
+            });
         }
 
         return res.status(201).send({
@@ -35,7 +38,10 @@ export async function createQuiz(req: Request, res: Response): Promise<any> {
         const createdQuiz = await quizService.createQuiz(body);
 
         if (!createdQuiz) {
-            throw new Error('Quiz not created');
+            return res.status(400).send({
+                success: false,
+                message: 'Quiz not created: invalid data or service error',
+            });
         }
 
         return res.status(201).send({
@@ -76,10 +82,14 @@ export async function getQuizById(req: Request, res: Response): Promise<any> {
     try {
 
         const { id } = req.params;
+
         const quiz = await quizService.getQuizById(Number(id));
 
         if (!quiz) {
-            throw new Error('Quiz not found');
+            return res.status(404).send({
+                success: false,
+                message: 'Quiz not found'
+            });
         }
 
         return res.status(200).send({
@@ -104,9 +114,89 @@ export async function getQuizByTheme(req: Request, res: Response): Promise<any> 
 
         const quiz = await quizService.getQuizByThemeWithQuestionsAndAnswers(theme);
 
+        if (!quiz) {
+            return res.status(404).send({
+                success: false,
+                message: 'Quiz not found'
+            });
+        }
+        if (quiz.length === 0) {
+            return res.status(404).send({
+                success: false,
+                message: 'Quiz not found'
+            });
+        }
+
         return res.status(200).send({
             success: true,
             message: 'Quiz fetched successfully',
+            data: quiz,
+        });
+
+    } catch (error: any) {
+        console.error(error);
+        return res.status(error.status || 500).send({
+            success: false,
+            message: error.message || 'Internal server error',
+        });
+    }
+}
+
+export async function updateQuiz(req: Request, res: Response): Promise<any> {
+    try {
+        const { id } = req.params;
+
+        if (!id || isNaN(Number(id))) {
+            return res.status(400).send({
+                success: false,
+                message: 'Invalid or missing quiz id'
+            });
+        }
+
+        const body = req.body;
+
+        const updatedQuiz = await quizService.updateQuiz(Number(id), body);
+
+        if (!updatedQuiz) {
+            return res.status(400).send({
+                success: false,
+                message: 'Quiz not updated'
+            });
+        }
+
+        return res.status(200).send({
+            success: true,
+            message: 'Quiz updated successfully',
+            data: updatedQuiz,
+        });
+
+    }
+    catch (error: any) {
+        console.error(error);
+        return res.status(error.status || 500).send({
+            success: false,
+            message: error.message || 'Internal server error',
+        });
+    }
+}
+
+export async function deleteQuiz(req: Request, res: Response): Promise<any> {
+    try {
+
+        const { id } = req.params;
+
+        if (!id || isNaN(Number(id))) {
+            return res.status(400).send({
+                success: false,
+                message: 'Invalid or missing quiz id'
+            });
+        }
+
+        const quiz = await quizService.deleteQuiz(Number(id));
+
+        return res.status(200).send({
+            success: true,
+            message: 'Quiz deleted successfully',
             data: quiz,
         });
 
@@ -127,12 +217,83 @@ export async function createQuestion(req: Request, res: Response): Promise<any> 
         const question = await quizService.createQuestion(body);
 
         if (!question) {
-            throw new Error('Question not created');
+            return res.status(400).send({
+                success: false,
+                message: 'Question not created'
+            });
         }
 
         return res.status(201).send({
             success: true,
             message: 'Question created successfully',
+            data: question,
+        });
+
+    } catch (error: any) {
+        console.error(error);
+        return res.status(error.status || 500).send({
+            success: false,
+            message: error.message || 'Internal server error',
+        });
+    }
+}
+
+export async function updateQuestion(req: Request, res: Response): Promise<any> {
+    try {
+
+        const { id } = req.params;
+
+        if (!id || isNaN(Number(id))) {
+            return res.status(400).send({
+                success: false,
+                message: 'Invalid or missing question id'
+            });
+        }
+
+        const body = req.body;
+
+        const question = await quizService.updateQuestion(Number(id), body);
+
+        if (!question) {
+            return res.status(400).send({
+                success: false,
+                message: 'Question not updated'
+            });
+        }
+
+        return res.status(200).send({
+            success: true,
+            message: 'Question updated successfully',
+            data: question,
+        });
+
+    }
+    catch (error: any) {
+        console.error(error);
+        return res.status(error.status || 500).send({
+            success: false,
+            message: error.message || 'Internal server error',
+        });
+    }
+}
+
+export async function getQuestionById(req: Request, res: Response): Promise<any> {
+    try {
+
+        const { id } = req.params;
+
+        const question = await quizService.getQuestionById(Number(id));
+
+        if (!question) {
+            return res.status(404).send({
+                success: false,
+                message: 'Question not found'
+            });
+        }
+
+        return res.status(200).send({
+            success: true,
+            message: 'Question fetched successfully',
             data: question,
         });
 
@@ -152,9 +313,16 @@ export async function getQuestionsByQuizId(req: Request, res: Response): Promise
 
         const question = await quizService.getQuestionsByQuizId(Number(id));
 
+        if (!question) {
+            return res.status(404).send({
+                success: false,
+                message: 'Questions not found'
+            });
+        }
+
         return res.status(200).send({
             success: true,
-            message: 'Question fetched successfully',
+            message: 'Questions fetched successfully',
             data: question,
         });
 
@@ -171,6 +339,13 @@ export async function deleteQuestion(req: Request, res: Response): Promise<any> 
     try {
 
         const { id } = req.params;
+
+        if (!id || isNaN(Number(id))) {
+            return res.status(400).send({
+                success: false,
+                message: 'Invalid or missing question id'
+            });
+        }
 
         const question = await quizService.deleteQuestion(Number(id));
 
@@ -197,12 +372,43 @@ export async function createAnswer(req: Request, res: Response): Promise<any> {
         const answer = await quizService.createAnswer(body);
 
         if (!answer) {
-            throw new Error('Answer not created');
+            return res.status(400).send({
+                success: false,
+                message: 'Answer not created'
+            });
         }
 
         return res.status(201).send({
             success: true,
             message: 'Answer created successfully',
+            data: answer,
+        });
+
+    } catch (error: any) {
+        console.error(error);
+        return res.status(error.status || 500).send({
+            success: false,
+            message: error.message || 'Internal server error',
+        });
+    }
+}
+
+export async function getAnswerById(req: Request, res: Response): Promise<any> {
+    try {
+        const { id } = req.params;
+
+        const answer = await quizService.getAnswerById(Number(id));
+
+        if (!answer) {
+            return res.status(404).send({ 
+                success: false, 
+                message: 'Answer not found' 
+            });
+        }
+
+        return res.status(200).send({
+            success: true,
+            message: 'Answer fetched successfully',
             data: answer,
         });
 
@@ -222,6 +428,13 @@ export async function getAnswersByQuestionId(req: Request, res: Response): Promi
 
         const answers = await quizService.getAnswersByQuestionId(Number(id));
 
+        if (!answers) {
+            return res.status(404).send({
+                success: false,
+                message: 'Answers not found'
+            });
+        }
+
         return res.status(200).send({
             success: true,
             message: 'Answer fetched successfully',
@@ -237,20 +450,36 @@ export async function getAnswersByQuestionId(req: Request, res: Response): Promi
     }
 }
 
-export async function deleteAnswer(req: Request, res: Response): Promise<any> {
+export async function updateAnswer(req: Request, res: Response): Promise<any> {
     try {
 
         const { id } = req.params;
 
-        const answer = await quizService.deleteAnswer(Number(id));
+        if (!id || isNaN(Number(id))) {
+            return res.status(400).send({
+                success: false,
+                message: 'Invalid or missing answer id'
+            });
+        }
+
+        const body = req.body;
+        const answer = await quizService.updateAnswer(Number(id), body);
+
+        if (!answer) {
+            return res.status(400).send({
+                success: false,
+                message: 'Answer not updated'
+            });
+        }
 
         return res.status(200).send({
             success: true,
-            message: 'Answer deleted successfully',
+            message: 'Answer updated successfully',
             data: answer,
         });
 
-    } catch (error: any) {
+    }
+    catch (error: any) {
         console.error(error);
         return res.status(error.status || 500).send({
             success: false,
@@ -259,17 +488,24 @@ export async function deleteAnswer(req: Request, res: Response): Promise<any> {
     }
 }
 
-export async function deleteQuiz(req: Request, res: Response): Promise<any> {
+export async function deleteAnswer(req: Request, res: Response): Promise<any> {
     try {
 
         const { id } = req.params;
 
-        const quiz = await quizService.deleteQuiz(Number(id));
+        if (!id || isNaN(Number(id))) {
+            return res.status(400).send({
+                success: false,
+                message: 'Invalid or missing answer id'
+            });
+        }
+
+        const answer = await quizService.deleteAnswer(Number(id));
 
         return res.status(200).send({
             success: true,
-            message: 'Quiz deleted successfully',
-            data: quiz,
+            message: 'Answer deleted successfully',
+            data: answer,
         });
 
     } catch (error: any) {
