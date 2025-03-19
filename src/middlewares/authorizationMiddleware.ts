@@ -3,8 +3,6 @@ import { Request, Response, NextFunction } from 'express';
 export function authorize(roles: string[]): any {
     return (req: Request, res: Response, next: NextFunction) => {
         const user = req.user;
-        console.log(`User role: ${JSON.stringify(user)}`);
-        console.log(`Required roles: ${roles.join(', ')}`);
 
         if (!user) {
             return res.status(401).json({ message: 'Usuário não autenticado.' });

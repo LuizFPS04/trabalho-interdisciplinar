@@ -20,7 +20,7 @@ export async function login(req: Request, res: Response): Promise<void> {
   }
 }
 
-// Rota para fazer logout
+
 export function logout(req: Request, res: Response): void {
   res.clearCookie('token');
   res.json({ message: 'Logout bem-sucedido' });
