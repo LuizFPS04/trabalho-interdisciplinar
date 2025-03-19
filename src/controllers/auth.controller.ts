@@ -5,6 +5,8 @@ export async function login(req: Request, res: Response): Promise<void> {
   try {
     const { email, password } = req.body;
 
+    console.log(password)
+
     const token = await authService.authenticateUser(email, password);
 
     res.cookie('token', token, {

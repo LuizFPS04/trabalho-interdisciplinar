@@ -1,0 +1,69 @@
+export type User = {
+  id: number;
+  email: string;
+  nickname: string;
+  password: string;
+  name: string;
+  birth: Date;
+  role?: string | null;
+  createdAt?: Date;
+  updatedAt?: Date;
+  quizzes?: Quiz[];
+  results?: Result[];
+  rankings?: Ranking[];
+};
+
+export type Quiz = {
+  id: number;
+  title: string;
+  theme: string;
+  description: string;
+  createdAt: Date;
+  updatedAt: Date;
+  questions?: Question[];
+  results?: Result[];
+  users?: User[];
+  rankings?: Ranking[];
+};
+
+export type Question = {
+  id: number;
+  content: string;
+  createdAt: Date;
+  updatedAt: Date;
+  quizId: number;
+  quiz?: Quiz;
+  answers?: Answer[];
+};
+
+export type Answer = {
+  id: number;
+  content: string;
+  isCorrect: boolean;
+  createdAt: Date;
+  updatedAt: Date;
+  questionId: number;
+  question?: Question;
+};
+
+export type Result = {
+  id: number;
+  score: number;
+  createdAt: Date;
+  updatedAt: Date;
+  userId: number;
+  user?: User;
+  quizId: number;
+  quiz?: Quiz;
+};
+
+export type Ranking = {
+  id: number;
+  score: number;
+  createdAt: Date;
+  updatedAt: Date;
+  userId: number;
+  user?: User;
+  quizId: number;
+  quiz?: Quiz;
+};

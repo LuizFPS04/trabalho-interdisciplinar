@@ -5,9 +5,19 @@ import { Request, Response } from 'express';
 export async function createUser(req: Request, res: Response): Promise<any> {
     try {
         const { name, email, nickname, password, birth, role } = req.body;
+        
+        const birthDate = new Date(birth);
+
+        if (isNaN(birthDate.getTime())) {
+            return res.status(400).send({
+                success: false,
+                message: 'Campo birth está com formato de data inválido.',
+            });
+        }
+
         const userType = role || 'normal';
 
-        const newUser = UserFactory.createUser(userType, { name, email, nickname, password, birth, role, createdAt: null, updatedAt: null });
+        const newUser: any = UserFactory.createUser(userType, { name, email, nickname, password, birth: birthDate });
 
         const createdUser = await userService.createUser(newUser);
 
@@ -116,8 +126,10 @@ export async function getUserByMail(req: Request, res: Response): Promise<any> {
 
 export async function getUserByNickname(req: Request, res: Response): Promise<any> {
     try {
-        const nickname = req.query.nickname as string;
+        const {nickname} = req.params;
         const user = await userService.getUserByNickname(nickname);
+
+        console.log(user)
 
         if (!user) {
             throw new Error('User not found');
@@ -143,7 +155,7 @@ export async function updateUser(req: Request, res: Response): Promise<any> {
         const { name, email, nickname, password, role } = req.body;
         const userType = role || 'normal';
 
-        const updatedUser = UserFactory.createUser(userType, { name, email, nickname, password });
+        const updatedUser: any = UserFactory.createUser(userType, { name, email, nickname, password });
 
         const user = await userService.updateUser(field, updatedUser);
 

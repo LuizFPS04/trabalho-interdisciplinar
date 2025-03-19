@@ -35,15 +35,23 @@ export async function getUserByIdWithDetails(id: number): Promise<User | null> {
         where: { id },
         include: {
             quizzes: true,
-            Ranking: true,
+            rankings: true,
             results: true
         },
     });
 }
 
-export async function createUser(user: User): Promise<User> {
+export async function createUser(userData: Omit<User, 'id' | 'createdAt' | 'updatedAt'>): Promise<User> {
+    // Criptografando a senha
+    const salt = await bcrypt.genSalt(10);  // Gera um salt para a criptografia
+    const hashedPassword = await bcrypt.hash(userData.password, salt);  // Criptografa a senha
+
+    // Agora, criando o usuário no banco com a senha criptografada
     return prismaClient.user.create({
-        data: user,
+        data: {
+            ...userData,  // Espalha os dados do usuário
+            password: hashedPassword,  // Substitui a senha original pela senha criptografada
+        },
     });
 }
 

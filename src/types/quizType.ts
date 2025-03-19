@@ -7,33 +7,33 @@ export interface Quiz {
     title: string;
     theme: string;
     description: string;
-    createdAt: Date;
-    updatedAt: Date;
+    createdAt: Date | null;
+    updatedAt: Date | null;
     questions?: Question[];
-    users?: User[];
     results?: Result[];
+    users?: User[];
     rankings?: Ranking[];
-}
+};
 
 export interface Question {
     id: number;
     content: string;
-    createdAt: Date; // Tornar obrigatório
-    updatedAt: Date; // Tornar obrigatório
-    quizId: number; // Adicionar quizId para relação com Quiz
-    quiz?: Quiz; // Relação com Quiz
-    answers?: Answer[]; // Relação com Answer
-}
+    createdAt: Date | null;
+    updatedAt: Date | null;
+    quizId: number;
+    quiz?: Quiz;
+    answers?: Answer[];
+};
 
 export interface Answer {
     id: number;
     content: string;
     isCorrect: boolean;
-    createdAt: Date; // Tornar obrigatório
-    updatedAt: Date; // Tornar obrigatório
-    questionId: number; // Adicionar questionId para relação com Question
-    question?: Question; // Relação com Question
-}
+    createdAt: Date | null;
+    updatedAt: Date | null;
+    questionId: number;
+    question?: Question;
+};
 
 export interface AnswerData {
     content: string;

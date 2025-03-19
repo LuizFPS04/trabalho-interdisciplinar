@@ -26,7 +26,7 @@ model User {
 
   quizzes Quiz[]
   results Result[]
-  Ranking Ranking[]
+  rankings Ranking[]
 }
 
 model Quiz {

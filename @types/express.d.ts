@@ -1,8 +1,9 @@
 import { Request } from "express";
-import { User } from "src/types/userType";
 
-declare module "express" {
-  export interface Request {
-    user?: User;
+declare global {
+  namespace Express {
+    interface Request {
+      user?: { id: number; email: string; role?: string };
+    }
   }
 }
