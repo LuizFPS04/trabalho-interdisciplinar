@@ -5,12 +5,12 @@ export function authorize(roles: string[]): any {
         const user = req.user;
 
         if (!user) {
-            return res.status(401).json({ message: 'Usuário não autenticado.' });
+            return res.status(401).json({ message: 'User not authenticated.' });
         }
 
         if (!user.role || !roles.includes(user.role)) {
             return res.status(403).json({
-                message: `Acesso negado. Permissões necessárias: ${roles.join(', ')}`
+                message: `Access denied. Required permissions: ${roles.join(', ')}`
             });
         }
 

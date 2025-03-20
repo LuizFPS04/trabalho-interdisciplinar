@@ -16,12 +16,19 @@ const app = express();
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
-const corsOptions = {
-    origin: 'http://localhost:5173',
-    credentials: true
-};
+const allowedOrigins = ['http://localhost:5173', 'https://seu-dominio.com'];
 
-app.use(cors(corsOptions));
+app.use(cors({
+    origin: function (origin, callback) {
+        if (!origin || allowedOrigins.includes(origin)) {
+            callback(null, true);
+        } else {
+            callback(new Error('Não permitido por CORS'));
+        }
+    },
+    credentials: true,
+    allowedHeaders: ['Content-Type', 'Authorization'],
+}));
 
 app.use(cookieParser());
 

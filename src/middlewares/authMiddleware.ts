@@ -10,10 +10,11 @@ interface JwtPayload {
 }
 
 export function authMiddleware(req: Request, res: Response, next: NextFunction): any {
+  
   const token = req.cookies.token || req.headers.authorization?.split(' ')[1];
 
   if (!token) {
-    return res.status(401).json({ message: 'Token de autenticação ausente' });
+    return res.status(401).json({ message: 'Missing authentication token' });
   }
 
   try {
@@ -22,7 +23,7 @@ export function authMiddleware(req: Request, res: Response, next: NextFunction):
     req.user = decoded;
     next();
   } catch (error) {
-    console.error('Erro na autenticação:', error);
-    res.status(401).json({ message: 'Token inválido ou expirado' });
+    console.error('Authentication error:', error);
+    res.status(401).json({ message: 'Invalid or expired token' });
   }
 }
