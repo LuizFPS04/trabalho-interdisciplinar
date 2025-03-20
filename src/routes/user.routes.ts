@@ -13,8 +13,8 @@ router.post('/logout', authController.logout);
 
 router.post('/user', validateCreateUser, userController.createUser);
 router.get('/user', authMiddleware, authorize(['admin']), userController.getAllUsers);
-router.get('/user/:id', authMiddleware, userController.getUserById);
 router.get('/user/details', authMiddleware, userController.getUserWithDetails);
+router.get('/user/:id', authMiddleware, userController.getUserById);
 router.put('/user', authMiddleware, authorize(['admin', 'normal']), userController.updateUser);
 router.delete('/user', authMiddleware, authorize(['admin']), userController.deleteUser);
 

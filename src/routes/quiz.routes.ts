@@ -10,8 +10,8 @@ const router = Router();
 router.post('/quiz/complete', validateQuizCreation, authMiddleware, authorize(['admin']), quizController.createCompleteQuiz);
 router.post('/quiz', validateQuizCreation, authMiddleware, authorize(['admin']), quizController.createQuiz);
 router.get('/quiz', quizController.getAllQuizzes);
-router.get('/quiz/:id', quizController.getQuizById);
 router.get('/quiz/theme', quizController.getQuizByTheme);
+router.get('/quiz/:id', quizController.getQuizById);
 
 router.post('/questions', validateQuestionCreation, authMiddleware, authorize(['admin']), quizController.createQuestion);
 router.get('/questions/quiz/:id', quizController.getQuestionsByQuizId);

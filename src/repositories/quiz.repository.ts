@@ -32,7 +32,10 @@ export async function getQuizById(id: number): Promise<Quiz | null> {
 export async function getQuizByTheme(theme: string): Promise<Quiz[] | null> {
     return prismaClient.quiz.findMany({
         where: {
-            theme,
+            theme: {
+                contains: theme,
+                mode: 'insensitive',
+            },
         },
         include: {
             questions: {
@@ -60,7 +63,12 @@ export async function getQuizWithQuestionsAndAnswers(id: number): Promise<Quiz |
 
 export async function getQuizByThemeWithQuestionsAndAnswers(theme: string): Promise<Quiz[] | null> {
     return prismaClient.quiz.findMany({
-        where: { theme },
+        where: { 
+            theme:  {
+                contains: theme,
+                mode: 'insensitive',
+            }
+        },
         include: {
             questions: {
                 include: {
