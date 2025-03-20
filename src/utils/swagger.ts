@@ -1763,7 +1763,7 @@ export const swaggerOptions = {
                 "QuestionCreationRequest": {
                     "type": "object",
                     "properties": {
-                        "text": {
+                        "content": {
                             "type": "string"
                         },
                         "quizId": {
@@ -1805,8 +1805,11 @@ export const swaggerOptions = {
                 "AnswerCreationRequest": {
                     "type": "object",
                     "properties": {
-                        "text": {
+                        "content": {
                             "type": "string"
+                        },
+                        "isCorrect": {
+                            "type": "boolean"
                         },
                         "questionId": {
                             "type": "integer"
