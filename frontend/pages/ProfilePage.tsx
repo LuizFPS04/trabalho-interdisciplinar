@@ -6,62 +6,24 @@ import { Trophy, Medal, Star, Calendar, Mail, LogOut } from 'lucide-react';
 function ProfilePage() {
   const navigate = useNavigate();
   
-  // Mock user data - will be replaced with actual user data from backend
-  const user: User = {
-    id: 1,
-    nickname: "JohnDoe",
-    email: "john@example.com",
-    password: "",
-    name: "John Doe",
-    birth: new Date('1990-01-01'),
-    role: "user",
-    createdAt: new Date('2024-01-01'),
-    results: [
-      {
-        id: 1,
-        score: 8,
-        createdAt: new Date('2024-03-15'),
-        quiz: {
-          id: 1,
-          title: "Biodiversidade da Mata Atlântica",
-          theme: "mata-atlantica",
-          description: "Teste seus conhecimentos sobre a Mata Atlântica",
-          createdAt: new Date(),
-          updatedAt: new Date(),
-        }
-      },
-      {
-        id: 2,
-        score: 6,
-        createdAt: new Date('2024-03-16'),
-        quiz: {
-          id: 2,
-          title: "Flora da Mata Atlântica",
-          theme: "mata-atlantica",
-          description: "Explore a diversidade da flora da Mata Atlântica",
-          createdAt: new Date(),
-          updatedAt: new Date(),
-        }
-      }
-    ]
-  };
+ 
 
   const handleLogout = () => {
     // TODO: Implement actual logout logic here
     navigate('/login');
   };
 
-  const totalScore = user.results?.reduce((sum, result) => sum + result.score, 0) || 0;
-  const averageScore = user.results && user.results.length > 0
-    ? totalScore / user.results.length
-    : 0;
+  // const totalScore = user.results?.reduce((sum, result) => sum + result.score, 0) || 0;
+  // const averageScore = user.results && user.results.length > 0
+  //   ? totalScore / user.results.length
+  //   : 0;
 
   return (
     <div className="container mx-auto px-4 py-8">
-      <div className="bg-green-800/50 backdrop-blur-sm rounded-lg overflow-hidden">
+    {/*  <div className="bg-green-800/50 backdrop-blur-sm rounded-lg overflow-hidden">
         <div className="p-8">
           <div className="grid md:grid-cols-3 gap-8">
-            {/* Profile Info */}
+           
             <div className="md:col-span-1">
               <div className="bg-white rounded-lg p-6 shadow-lg">
                 <div className="text-center mb-6">
@@ -92,9 +54,9 @@ function ProfilePage() {
               </div>
             </div>
 
-            {/* Stats and Recent Activity */}
+          //Stats and Recent Activity
             <div className="md:col-span-2">
-              {/* Stats */}
+              // Stats
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
                 <div className="bg-white rounded-lg p-6 shadow-lg">
                   <div className="flex items-center mb-2">
@@ -121,7 +83,7 @@ function ProfilePage() {
                 </div>
               </div>
 
-              {/* Recent Activity */}
+              //Recent Activity
               <div className="bg-white rounded-lg p-6 shadow-lg">
                 <h3 className="text-xl font-semibold text-gray-800 mb-4">Histórico de Quizzes</h3>
                 <div className="space-y-4">
@@ -145,7 +107,7 @@ function ProfilePage() {
             </div>
           </div>
         </div>
-      </div>
+      </div>*/}
     </div>
   );
 }

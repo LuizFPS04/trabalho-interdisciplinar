@@ -1,51 +1,76 @@
-import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
-import { Leaf, Mail, Lock, User } from 'lucide-react';
-
-function RegisterPage() {
-  const [name, setName] = useState('');
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [confirmPassword, setConfirmPassword] = useState('');
-
+import React, { useContext, useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
+import { Leaf, Mail, Lock, User, Calendar } from "lucide-react";
+import { UserContext } from "../contexts/User";
+import { User as UserType } from "../../backend/types/userType";
+type RegisterPageProps = {
+  onRegister: (headers: any) => void;
+};
+function RegisterPage({ onRegister }: RegisterPageProps) {
+  const [name, setName] = useState("");
+  const [birth, setBirth] = useState("");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
+  const userContext = useContext(UserContext); // Aqui pegando diretamente
+  const navigate = useNavigate();
+  
   const validateEmail = (email: string) => {
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     return emailRegex.test(email);
   };
-  
+
   const handleSubmit = async (e: React.FormEvent) => {
+    const nickname = name.split(" ");
     e.preventDefault();
-  
+
     if (!validateEmail(email)) {
       alert("Por favor, insira um e-mail válido.");
       return;
     }
-  
+
     if (password !== confirmPassword) {
       alert("As senhas não coincidem!");
       return;
     }
-  
-    const userData = {
-      name,
+
+    if (!name || !birth) {
+      alert("Preencha todos os campos obrigatórios.");
+      return;
+    }
+
+    const userData: Omit<
+      UserType,
+      "id" | "createdAt" | "updatedAt" | "quizzes" | "results" | "rankings"
+    > = {
       email,
       password,
+      name,
+      birth: new Date(birth),
+      role: "normal",
+      nickname: nickname[0],
     };
-  
+
     try {
-      const response = await fetch("https://suaapi.com/usuarios", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(userData),
-      });
-  
+      const response = await fetch(
+        "https://biogenius.onrender.com/api/v1/user",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(userData),
+        }
+      );
+
       const data = await response.json();
-  
+      console.log(data);
       if (response.ok) {
-        alert("Conta criada com sucesso!");
-        // Redirecionar ou limpar o formulário
+        onRegister(data.headers);
+        const registeredUser: UserType = data.data;
+        userContext?.setUser(registeredUser)
+
+
       } else {
         alert(`Erro: ${data.message}`);
       }
@@ -54,13 +79,11 @@ function RegisterPage() {
       alert("Erro ao conectar com o servidor.");
     }
   };
-  
-  
 
   return (
     <div className="min-h-screen flex justify-center py-12 px-4 sm:px-6 lg:px-8 relative">
       <div className="absolute inset-0 bg-green-800/30 backdrop-blur-sm"></div>
-      
+
       <div className="max-w-md w-full space-y-8 relative">
         <div className="bg-white rounded-lg shadow-xl p-8">
           <div className="text-center">
@@ -73,8 +96,11 @@ function RegisterPage() {
               Crie sua conta
             </h2>
             <p className="mt-2 text-sm text-gray-600">
-              Já tem uma conta?{' '}
-              <Link to="/login" className="font-medium text-green-600 hover:text-green-500">
+              Já tem uma conta?{" "}
+              <Link
+                to="/login"
+                className="font-medium text-green-600 hover:text-green-500"
+              >
                 Faça login
               </Link>
             </p>
@@ -82,14 +108,12 @@ function RegisterPage() {
 
           <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
             <div className="space-y-4">
+              {/* Nome */}
               <div>
-                <label htmlFor="name" className="sr-only">
-                  Nome
+                <label htmlFor="name" className="block text-sm font-medium text-gray-700">
+                  Digite seu nome
                 </label>
-                <div className="relative">
-                  <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                    <User className="h-5 w-5 text-gray-400" />
-                  </div>
+                <div className="relative mt-1">
                   <input
                     id="name"
                     name="name"
@@ -97,20 +121,36 @@ function RegisterPage() {
                     required
                     value={name}
                     onChange={(e) => setName(e.target.value)}
-                    className="appearance-none relative block w-full px-3 py-2 pl-10 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-md focus:outline-none focus:ring-green-500 focus:border-green-500 focus:z-10 sm:text-sm"
-                    placeholder="Nome completo"
+                    className="appearance-none relative block w-full px-3 py-2 border border-gray-300 text-gray-900  rounded-md focus:outline-none focus:ring-green-500 focus:border-green-500 sm:text-sm"
+                   
                   />
                 </div>
               </div>
 
+              {/* Data de Nascimento */}
               <div>
-                <label htmlFor="email" className="sr-only">
-                  Email
+                <label htmlFor="birth" className="block text-sm font-medium text-gray-700">
+                  Digite sua data de nascimento
                 </label>
-                <div className="relative">
-                  <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                    <Mail className="h-5 w-5 text-gray-400" />
-                  </div>
+                <div className="relative mt-1">
+                  <input
+                    id="birth"
+                    name="birth"
+                    type="date"
+                    required
+                    value={birth}
+                    onChange={(e) => setBirth(e.target.value)}
+                    className="appearance-none relative block w-full px-3 py-2 border border-gray-300 text-gray-900  rounded-md focus:outline-none focus:ring-green-500 focus:border-green-500 sm:text-sm"
+                  />
+                </div>
+              </div>
+
+              {/* Email */}
+              <div>
+                <label htmlFor="email" className="block text-sm font-medium text-gray-700">
+                  Digite seu email
+                </label>
+                <div className="relative mt-1">
                   <input
                     id="email"
                     name="email"
@@ -119,20 +159,18 @@ function RegisterPage() {
                     required
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
-                    className="appearance-none relative block w-full px-3 py-2 pl-10 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-md focus:outline-none focus:ring-green-500 focus:border-green-500 focus:z-10 sm:text-sm"
-                    placeholder="Email"
+                    className="appearance-none relative block w-full px-3 py-2 border border-gray-300 text-gray-900  rounded-md focus:outline-none focus:ring-green-500 focus:border-green-500 sm:text-sm"
+                  
                   />
                 </div>
               </div>
 
+              {/* Senha */}
               <div>
-                <label htmlFor="password" className="sr-only">
-                  Senha
+                <label htmlFor="password" className="block text-sm font-medium text-gray-700">
+                  Escolha sua senha
                 </label>
-                <div className="relative">
-                  <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                    <Lock className="h-5 w-5 text-gray-400" />
-                  </div>
+                <div className="relative mt-1">
                   <input
                     id="password"
                     name="password"
@@ -140,20 +178,18 @@ function RegisterPage() {
                     required
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
-                    className="appearance-none relative block w-full px-3 py-2 pl-10 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-md focus:outline-none focus:ring-green-500 focus:border-green-500 focus:z-10 sm:text-sm"
-                    placeholder="Senha"
+                    className="appearance-none relative block w-full px-3 py-2 border border-gray-300 text-gray-900  rounded-md focus:outline-none focus:ring-green-500 focus:border-green-500 sm:text-sm"
+                 
                   />
                 </div>
               </div>
 
+              {/* Confirmar Senha */}
               <div>
-                <label htmlFor="confirmPassword" className="sr-only">
-                  Confirmar Senha
+                <label htmlFor="confirmPassword" className="block text-sm font-medium text-gray-700">
+                  Confirme a senha
                 </label>
-                <div className="relative">
-                  <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                    <Lock className="h-5 w-5 text-gray-400" />
-                  </div>
+                <div className="relative mt-1">
                   <input
                     id="confirmPassword"
                     name="confirmPassword"
@@ -161,13 +197,14 @@ function RegisterPage() {
                     required
                     value={confirmPassword}
                     onChange={(e) => setConfirmPassword(e.target.value)}
-                    className="appearance-none relative block w-full px-3 py-2 pl-10 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-md focus:outline-none focus:ring-green-500 focus:border-green-500 focus:z-10 sm:text-sm"
-                    placeholder="Confirmar senha"
+                    className="appearance-none relative block w-full px-3 py-2 border border-gray-300 text-gray-900  rounded-md focus:outline-none focus:ring-green-500 focus:border-green-500 sm:text-sm"
+                    
                   />
                 </div>
               </div>
             </div>
 
+            {/* Botão de Criar Conta */}
             <button
               type="submit"
               className="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500"

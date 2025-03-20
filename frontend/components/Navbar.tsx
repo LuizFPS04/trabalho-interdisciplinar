@@ -1,17 +1,19 @@
-import React from 'react';
-import { Leaf, User } from 'lucide-react';
-import { Link, useLocation, useNavigate } from 'react-router-dom';
-
-function Navbar() {
+import React from "react";
+import { Leaf, User } from "lucide-react";
+import { Link, useLocation, useNavigate } from "react-router-dom";
+type NavBarProps = {
+  isAuthenticated: boolean;
+};
+function Navbar({ isAuthenticated }: NavBarProps) {
   const location = useLocation();
   const navigate = useNavigate();
 
   const scrollToAbout = (e: React.MouseEvent) => {
-    if (location.pathname === '/') {
+    if (location.pathname === "/") {
       e.preventDefault();
-      const aboutSection = document.getElementById('about-section');
+      const aboutSection = document.getElementById("about-section");
       if (aboutSection) {
-        aboutSection.scrollIntoView({ behavior: 'smooth' });
+        aboutSection.scrollIntoView({ behavior: "smooth" });
       }
     }
   };
@@ -24,23 +26,41 @@ function Navbar() {
             <Leaf className="text-white" size={24} />
             <span className="text-white text-xl font-semibold">BioGenius</span>
           </Link>
-          
+
           <div className="flex items-center space-x-8">
-            <NavLink to="/" active={location.pathname === "/"}>Início</NavLink>
-            <button 
+            <NavLink to="/" active={location.pathname === "/"}>
+              Início
+            </NavLink>
+            <button
               onClick={scrollToAbout}
               className="text-white hover:text-green-200 transition-colors"
             >
               Sobre
             </button>
-            <NavLink to="/ranking" active={location.pathname === "/ranking"}>Ranking</NavLink>
-            <Link 
-              to="/profile"
-              className="flex items-center space-x-2 text-white hover:text-green-200 transition-colors"
-            >
-              <User size={20} />
-              <span>Perfil</span>
-            </Link>
+            <NavLink to="/ranking" active={location.pathname === "/ranking"}>
+              Ranking
+            </NavLink>
+            {/* {isAuthenticated ? (
+              <>
+                <Link
+                  to="/profile"
+                  className="flex items-center space-x-2 text-white hover:text-green-200 transition-colors"
+                >
+                  <User size={20} />
+                  <span>Perfil</span>
+                </Link>
+              </>
+            ) : (
+              <> */}
+                <Link
+                  to="/login"
+                  className="flex items-center space-x-2 text-white hover:text-green-200 transition-colors"
+                >
+                  <User size={20} />
+                  <span>Login</span>
+                </Link>
+              {/* </>
+            )} */}
           </div>
         </div>
       </div>
@@ -59,7 +79,7 @@ function NavLink({ children, active, to }: NavLinkProps) {
     <Link
       to={to}
       className={`text-white hover:text-green-200 transition-colors ${
-        active ? 'font-semibold' : ''
+        active ? "font-semibold" : ""
       }`}
     >
       {children}
