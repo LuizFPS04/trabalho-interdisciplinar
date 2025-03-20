@@ -5,7 +5,7 @@ import { Ranking } from "./rankingType";
 export interface User {
   id: number;
   email: string;
-  nickname: string;
+  nickname?: string;
   password: string;
   name: string;
   birth: Date;

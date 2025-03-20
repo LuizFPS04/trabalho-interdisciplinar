@@ -12,7 +12,7 @@ export async function createUser(req: Request, res: Response): Promise<any> {
         if (isNaN(birthDate.getTime())) {
             return res.status(400).send({
                 success: false,
-                message: 'Campo birth está com formato de data inválido.',
+                message: 'Format invalid in birth.',
             });
         }
 
@@ -70,7 +70,7 @@ export async function getAllUsers(req: Request, res: Response): Promise<any> {
 
 export async function getUserWithDetails(req: Request, res: Response): Promise<any> {
     try {
-        const field: any = req.query.email || req.query.nickname;
+        const field: any = req.query.email;
 
         const user = await userService.getUserWithDetails(field);
 
@@ -126,32 +126,6 @@ export async function getUserByMail(req: Request, res: Response): Promise<any> {
     try {
         const email = req.query.email as string;
         const user = await userService.getUserByMail(email);
-
-        if (!user) {
-            return res.status(404).send({
-                success: false,
-                message: 'User not found',
-            });
-        }
-
-        return res.status(200).send({
-            success: true,
-            message: 'User fetched successfully',
-            data: user,
-        });
-    } catch (error: any) {
-        console.error(error);
-        return res.status(error.status || 500).send({
-            success: false,
-            message: error.message || 'Internal server error',
-        });
-    }
-}
-
-export async function getUserByNickname(req: Request, res: Response): Promise<any> {
-    try {
-        const nickname = req.query.nickname as string;
-        const user = await userService.getUserByNickname(nickname);
 
         if (!user) {
             return res.status(404).send({

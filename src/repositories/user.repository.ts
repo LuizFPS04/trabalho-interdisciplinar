@@ -22,14 +22,6 @@ export async function getUserByMail(email: string): Promise<User | null> {
     });
 }
 
-export async function getUserByNickname(nickname: string): Promise<User | null> {
-    return prismaClient.user.findUnique({
-        where: {
-            nickname,
-        },
-    });
-}
-
 export async function getUserByIdWithDetails(id: number): Promise<User | null> {
     return prismaClient.user.findUnique({
         where: { id },
@@ -42,15 +34,14 @@ export async function getUserByIdWithDetails(id: number): Promise<User | null> {
 }
 
 export async function createUser(userData: Omit<User, 'id' | 'createdAt' | 'updatedAt'>): Promise<User> {
-    // Criptografando a senha
-    const salt = await bcrypt.genSalt(10);  // Gera um salt para a criptografia
-    const hashedPassword = await bcrypt.hash(userData.password, salt);  // Criptografa a senha
 
-    // Agora, criando o usuário no banco com a senha criptografada
+    const salt = await bcrypt.genSalt(10);
+    const hashedPassword = await bcrypt.hash(userData.password, salt);
+
     return prismaClient.user.create({
         data: {
-            ...userData,  // Espalha os dados do usuário
-            password: hashedPassword,  // Substitui a senha original pela senha criptografada
+            ...userData,
+            password: hashedPassword,
         },
     });
 }

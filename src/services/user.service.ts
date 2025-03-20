@@ -13,18 +13,11 @@ export async function getUserByMail(email: string): Promise<User | null> {
     return userRepository.getUserByMail(email);
 }
 
-export async function getUserByNickname(nickname: string): Promise<User | null> {
-    return userRepository.getUserByNickname(nickname);
-}
-
 export async function getUserWithDetails(field: string): Promise<User | null> {
     let searchUser: User | null = await userRepository.getUserByMail(field);
 
     if (!searchUser) {
-        searchUser = await userRepository.getUserByNickname(field);
-        if (!searchUser) {
-            throw new Error("User not found");
-        }
+        throw new Error("User not found");
     }
 
     const id: number = searchUser.id;
@@ -40,10 +33,7 @@ export async function updateUser(field: string, user: User): Promise<User> {
     let searchUser: User | null = await userRepository.getUserByMail(field);
 
     if (!searchUser) {
-        searchUser = await userRepository.getUserByNickname(field);
-        if (!searchUser) {
-            throw new Error("User not found");
-        }
+        throw new Error("User not found");
     }
 
     const id: number = searchUser.id;
@@ -54,10 +44,7 @@ export async function deleteUser(field: string): Promise<User> {
     let searchUser: User | null = await userRepository.getUserByMail(field);
 
     if (!searchUser) {
-        searchUser = await userRepository.getUserByNickname(field);
-        if (!searchUser) {
-            throw new Error("User not found");
-        }
+        throw new Error("User not found");
     }
 
     const id: number = searchUser.id;
