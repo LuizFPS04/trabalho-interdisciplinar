@@ -13,7 +13,7 @@ export async function login(req: Request, res: Response): Promise<void> {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
       maxAge: 3600 * 24000,
-      sameSite: 'strict', 
+      sameSite: 'none', 
     });
 
     res.json({ id: userId, message: 'Login bem-sucedido' });
