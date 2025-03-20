@@ -7,6 +7,11 @@ export const swaggerOptions = {
             "title": "BioGenius API",
             "version": "1.0.0"
         },
+        "servers": [
+            {
+                "url": "https://biogenius.onrender.com/api/v1"
+            }
+        ],
         "paths": {
             "/login": {
                 "post": {
