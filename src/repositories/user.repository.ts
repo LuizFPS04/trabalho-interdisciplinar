@@ -11,6 +11,11 @@ export async function getUserById(id: number): Promise<User | null> {
         where: {
             id,
         },
+        include: {
+            quizzes: true,
+            rankings: true,
+            results: true
+        },
     });
 }
 
