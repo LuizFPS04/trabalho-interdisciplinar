@@ -5,7 +5,9 @@ export async function login(req: Request, res: Response): Promise<void> {
   try {
     const { email, password } = req.body;
 
-    const token = await authService.authenticateUser(email, password);
+    const userAuth = await authService.authenticateUser(email, password);
+    const token = userAuth.token;
+    const userId = userAuth.id;
 
     res.cookie('token', token, {
       httpOnly: true,
@@ -14,7 +16,7 @@ export async function login(req: Request, res: Response): Promise<void> {
       sameSite: 'strict', 
     });
 
-    res.json({ message: 'Login bem-sucedido' });
+    res.json({ id: userId, message: 'Login bem-sucedido' });
   } catch (error: any) {
     res.status(401).json({ message: error.message });
   }

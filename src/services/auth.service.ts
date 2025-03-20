@@ -21,7 +21,7 @@ function generateToken(user: User): string {
 export async function authenticateUser(
   email: string,
   password: string
-): Promise<string> {
+): Promise<any> {
   const user = await userRepository.getUserByMail(email);
 
   if (!user) {
@@ -38,5 +38,8 @@ export async function authenticateUser(
   }
 
   const token = generateToken(user);
-  return token;
+  return {
+    token: token,
+    id: user.id
+  };
 }
