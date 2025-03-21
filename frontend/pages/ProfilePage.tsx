@@ -1,4 +1,4 @@
-import React, { useContext, useEffect } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { User, Result } from '../types';
 import { Trophy, Medal, Star, Calendar, Mail, LogOut, Cake } from 'lucide-react';
@@ -9,35 +9,67 @@ import axios from 'axios';
 moment.locale("pt-br");
 
 type RegisterProps = {
-  isUserLogged: (headers:any) => void;
+  isUserLogged: (headers: any) => void;
 }
 
-function ProfilePage({isUserLogged}: RegisterProps) {
-  // const navigate = useNavigate();
+function ProfilePage({ isUserLogged }: RegisterProps) {
+  const navigate = useNavigate();
   const userContext = useContext(UserContext);
+  const [userData, setUserData] = useState<User | null>(null);
   const date = moment();
 
   const handleLogout = () => {
     userContext?.clearUser();
     isUserLogged(false);
+    navigate('/'); 
   };
-  
-  const user = userContext?.user;
+
+  useEffect(() => {
+    const fetchUserData = async () => {
+      try {
+        const response = await axios.get(`https://biogenius.onrender.com/api/v1/user/${userContext?.user?.id ?? ""}`, {
+          withCredentials: true
+        });
+
+        if (response.status === 200 || response.status === 201) {
+          const data = response.data.data;
+          setUserData(data);
+
+          if (data) {
+            userContext?.setUser(data);
+          }
+
+        } else {
+          alert(response.data.message);
+        }
+      } catch (error) {
+        if (axios.isAxiosError(error)) {
+          console.error("Erro ao logar:", error.response?.data?.message || error.message);
+          alert(`Erro: ${error.response?.data?.message || "Erro ao conectar com o servidor."}`);
+        } else {
+          console.error("Erro desconhecido:", error);
+          alert("Erro desconhecido ao conectar com o servidor.");
+        }
+      }
+    };
+
+    fetchUserData();
+  }, [userContext]);
+
+  const user = userData ?? userContext?.user;
   const birth = moment(user?.birth);
- 
-  const totalScore = user?.results ? user?.results.reduce((acc, current) => 
+
+  const totalScore = user?.results ? user?.results.reduce((acc, current) =>
     acc + parseInt(current.score), 0
-  ): 0;
-  
- const averageScore = isNaN(totalScore/user?.results?.length) ? 0 : totalScore/user?.results?.length
- 
+  ) : 0;
+
+  const averageScore = isNaN(totalScore / user?.results?.length) ? 0 : totalScore / user?.results?.length;
 
   return (
     <div className="container mx-auto px-4 py-8">
-     <div className="bg-green-800/50 backdrop-blur-sm rounded-lg overflow-hidden">
+      <div className="bg-green-800/50 backdrop-blur-sm rounded-lg overflow-hidden">
         <div className="p-8">
           <div className="grid md:grid-cols-3 gap-8">
-           
             <div className="md:col-span-1">
               <div className="bg-white rounded-lg p-6 shadow-lg">
                 <div className="text-center mb-6">
@@ -47,7 +79,7 @@ function ProfilePage({isUserLogged}: RegisterProps) {
                   <h2 className="text-2xl font-bold text-gray-800">{user?.name}</h2>
                   <p className="text-gray-500">@{user?.nickname}</p>
                 </div>
-                
+
                 <div className="space-y-4">
                   <div className="flex items-center text-gray-600">
                     <Mail className="w-5 h-5 mr-3 text-green-600" />
@@ -73,7 +105,6 @@ function ProfilePage({isUserLogged}: RegisterProps) {
             </div>
 
             <div className="md:col-span-2">
-   
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
                 <div className="bg-white rounded-lg p-6 shadow-lg">
                   <div className="flex items-center mb-2">
@@ -82,7 +113,7 @@ function ProfilePage({isUserLogged}: RegisterProps) {
                   </div>
                   <p className="text-3xl font-bold text-green-600">{totalScore}</p>
                 </div>
-                
+
                 <div className="bg-white rounded-lg p-6 shadow-lg">
                   <div className="flex items-center mb-2">
                     <Medal className="w-6 h-6 text-green-600 mr-2" />
@@ -100,7 +131,6 @@ function ProfilePage({isUserLogged}: RegisterProps) {
                 </div>
               </div>
 
-           
               <div className="bg-white rounded-lg p-6 shadow-lg">
                 <h3 className="text-xl font-semibold text-gray-800 mb-4">Histórico de Quizzes</h3>
                 <div className="space-y-4">

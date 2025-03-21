@@ -78,32 +78,32 @@ function QuizPage() {
     } 
   };
 
-  const refreshUser = async () => {
-    try {
-      const response = await axios.get(`https://biogenius.onrender.com/api/v1/user/${user?.id ?? ""}`, {
-        withCredentials: true
-      });
+  // const refreshUser = async () => {
+  //   try {
+  //     const response = await axios.get(`https://biogenius.onrender.com/api/v1/user/${user?.id ?? ""}`, {
+  //       withCredentials: true
+  //     });
 
-      if (response.status === 200 || response.status === 201) {
-        const data = response.data.data;
+  //     if (response.status === 200 || response.status === 201) {
+  //       const data = response.data.data;
 
-        if (data) {
-          userContext?.setUser(data);
-        }
+  //       if (data) {
+  //         userContext?.setUser(data);
+  //       }
 
-      } else {
-        alert(response.data.message);
-      }
-    } catch (error) {
-      if (axios.isAxiosError(error)) {
-        console.error("Erro ao logar:", error.response?.data?.message || error.message);
-        alert(`Erro: ${error.response?.data?.message || "Erro ao conectar com o servidor."}`);
-      } else {
-        console.error("Erro desconhecido:", error);
-        alert("Erro desconhecido ao conectar com o servidor.");
-      }
-    } 
-  };
+  //     } else {
+  //       alert(response.data.message);
+  //     }
+  //   } catch (error) {
+  //     if (axios.isAxiosError(error)) {
+  //       console.error("Erro ao logar:", error.response?.data?.message || error.message);
+  //       alert(`Erro: ${error.response?.data?.message || "Erro ao conectar com o servidor."}`);
+  //     } else {
+  //       console.error("Erro desconhecido:", error);
+  //       alert("Erro desconhecido ao conectar com o servidor.");
+  //     }
+  //   } 
+  // };
 
   useEffect(() => {
     if (showResult) {
@@ -114,7 +114,7 @@ function QuizPage() {
       };
       setResult(newResult);
       postResult(newResult);
-      refreshUser();
+      // refreshUser();
     }
   }, [showResult]);
 
