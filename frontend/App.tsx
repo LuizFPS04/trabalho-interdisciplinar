@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import { Routes, Route, Navigate, useNavigate } from 'react-router-dom';
 import HomePage from './pages/HomePage';
 import QuizListPage from './pages/QuizListPage';
@@ -8,34 +8,50 @@ import RegisterPage from './pages/RegisterPage';
 import ProfilePage from './pages/ProfilePage';
 import RankingPage from './pages/RankingPage';
 import Navbar from './components/Navbar';
+import { UserContext } from './contexts/User';
+import axios from 'axios';
+import { QuizContext } from './contexts/Quiz';
 
 function App() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const navigate = useNavigate();
+  const quizContext = useContext(QuizContext)
+  const userContext = useContext(UserContext);
 
-  // Verifica se o usuário está autenticado ao carregar o app
-  useEffect(() => {
-    const token = localStorage.getItem('token');
-    if (token) {
-      setIsAuthenticated(true);
-    } else {
-      setIsAuthenticated(false);
+  const getQuiz = async () =>{
+    try {
+      const response = await axios.get(
+        "https://biogenius.onrender.com/api/v1/quiz"
+      );
+
+      const data = response.data; 
+      if (response.status === 200 || response.status === 201) {
+        quizContext?.setQuizzes(data.data);
+
+      } else {
+        alert(`Erro: ${data.message}`);
+      }
+    } catch (error) {
+      if (axios.isAxiosError(error)) {
+        console.error("Erro ao criar conta:", error.response?.data?.message || error.message);
+        alert(`Erro: ${error.response?.data?.message || "Erro ao conectar com o servidor."}`);
+      } else {
+        console.error("Erro desconhecido:", error);
+        alert("Erro desconhecido ao conectar com o servidor.");
+      }
+    } 
+  }
+
+  useEffect(()=>{
+    if(!quizContext?.hasQuizzes()){
+      getQuiz();
     }
-  }, []);
+  },[])
 
-  // Função para fazer login
-  const handleLogin = (token) => {
-    localStorage.setItem('token', token);
-    setIsAuthenticated(true);
-    navigate('/'); // Redireciona para a página de perfil após o login
+  const isUserLogged = (isLogged:boolean) => {
+    setIsAuthenticated(isLogged);
+    navigate('/'); 
   };
-
-  // // Função para fazer logout
-  // const handleLogout = () => {
-  //   localStorage.removeItem('token');
-  //   setIsAuthenticated(false);
-  //   navigate('/login'); // Redireciona para a página de login após o logout
-  // };
 
   return (
     <div className="min-h-screen bg-green-700/80">
@@ -43,17 +59,18 @@ function App() {
       <Routes>
         {/* Rotas públicas */}
         <Route path="/" element={<HomePage/>} />
-        <Route path="/quizzes/:category" element={<QuizListPage />} />
-        <Route path="/quiz/:category/:quizId" element={<QuizPage />} />
-        <Route path="/login" element={<LoginPage isAuthenticated={isAuthenticated} onLogin={handleLogin} />} />
-        <Route path="/register" element={<RegisterPage onRegister={handleLogin} />} />
+        <Route path="/quizzes/:theme" element={<QuizListPage />} />
+        <Route path="/quiz/:theme/:quizId" element={<QuizPage />} />
+        <Route path="/login" element={<LoginPage isUserLogged={isUserLogged} />} />
+        {/*     <Route path="/login" element={<LoginPage isAuthenticated={isAuthenticated} onLogin={handleLogin} />} /> */}
+        <Route path="/register" element={<RegisterPage onRegister={isUserLogged} />} />
 
         {/* Rotas protegidas */}
         <Route
           path="/profile"
           element={
             isAuthenticated ? (
-              <ProfilePage />
+              <ProfilePage isUserLogged={isUserLogged}/>
             ) : (
               <Navigate to="/login" />
             )

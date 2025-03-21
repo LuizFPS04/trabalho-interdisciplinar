@@ -1,84 +1,42 @@
-import React from 'react';
+import React, { useContext, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { ArrowLeft } from 'lucide-react';
-import { Quiz } from '../types';
+import { Quiz } from '../../backend/types/quizType';
+import { QuizContext } from '../contexts/Quiz';
 
 function QuizListPage() {
-  const { category } = useParams();
-  const navigate = useNavigate();
+  const { theme } = useParams() ?? "";
 
-  const quizzes: Record<string, Quiz[]> = {
-    'mata-atlantica': [
-      {
-        id: 1,
-        title: 'Biodiversidade da Mata Atlântica',
-        theme: 'mata-atlantica',
-        description: 'Teste seus conhecimentos sobre a Mata Atlântica',
-        createdAt: new Date(),
-        updatedAt: new Date(),
-      },
-      {
-        id: 2,
-        title: 'Flora da Mata Atlântica',
-        theme: 'mata-atlantica',
-        description: 'Explore a diversidade da flora da Mata Atlântica',
-        createdAt: new Date(),
-        updatedAt: new Date(),
-      },
-    ],
-    'fauna': [
-      {
-        id: 3,
-        title: 'Mamíferos Brasileiros',
-        theme: 'fauna',
-        description: 'Descubra mais sobre nossa fauna',
-        createdAt: new Date(),
-        updatedAt: new Date(),
-      },
-    ],
-    'flora': [
-      {
-        id: 4,
-        title: 'Árvores Nativas',
-        theme: 'flora',
-        description: 'Explore a diversidade da nossa flora',
-        createdAt: new Date(),
-        updatedAt: new Date(),
-      },
-    ],
-    'biomas': [
-      {
-        id: 5,
-        title: 'Amazônia',
-        theme: 'biomas',
-        description: 'Conheça os diferentes biomas brasileiros',
-        createdAt: new Date(),
-        updatedAt: new Date(),
-      },
-    ],
-    'sustentabilidade': [
-      {
-        id: 6,
-        title: 'Reciclagem',
-        theme: 'sustentabilidade',
-        description: 'Aprenda sobre práticas sustentáveis',
-        createdAt: new Date(),
-        updatedAt: new Date(),
-      },
-    ],
+  const navigate = useNavigate();
+  const quizContext = useContext(QuizContext);
+  const quiz = quizContext?.quizzes;
+
+  const faunaQuizzes = Array.isArray(quiz) && quiz.filter(quiz => quiz.theme === "Fauna");
+  const floraQuizzes = Array.isArray(quiz) && quiz.filter(quiz => quiz.theme === "Flora");
+  const biomasQuizzes = Array.isArray(quiz) && quiz.filter(quiz => quiz.theme === "Biomas");
+  const sustentabilidadeQuizzes = Array.isArray(quiz) && quiz.filter(quiz => quiz.theme === "Sustentabilidade");
+ console.log(quizContext?.quizzes)
+
+  const quizzes = {
+    'fauna': faunaQuizzes,
+    'flora': floraQuizzes,
+    'biomas': biomasQuizzes,
+    'sustentabilidade': sustentabilidadeQuizzes,
   };
 
-  const categoryTitles: Record<string, string> = {
-    'mata-atlantica': 'Mata Atlântica',
+
+
+  const themeTitles: Record<string, string> = {
     'fauna': 'Fauna Brasileira',
     'flora': 'Flora Brasileira',
     'biomas': 'Biomas do Brasil',
     'sustentabilidade': 'Sustentabilidade',
   };
 
-  const currentQuizzes = quizzes[category as keyof typeof quizzes] || [];
-  const categoryTitle = categoryTitles[category as keyof typeof categoryTitles] || category;
-
+  
+  const themeTitle = themeTitles[theme?.toLowerCase() ?? ""]  ?? "";
+  const currentQuizzes = quizzes[theme?.toLowerCase() ?? ""] ?? [];
+  console.log(currentQuizzes)
   return (
     <div className="container mx-auto px-4 py-8">
       <div className="bg-green-800/50 rounded-lg p-8 backdrop-blur-sm">
@@ -89,30 +47,30 @@ function QuizListPage() {
           >
             <ArrowLeft className="h-6 w-6" />
           </button>
-          <h1 className="text-4xl font-bold text-white">Quizzes sobre {categoryTitle}</h1>
+          <h1 className="text-4xl font-bold text-white">Quizzes sobre {themeTitle}</h1>
         </div>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {currentQuizzes.map((quiz) => (
+          {currentQuizzes.map((quiz) => 
+          
+          {
+       
+            return(
             <div key={quiz.id} className="bg-white rounded-lg overflow-hidden shadow-lg hover:shadow-xl transition-all transform hover:-translate-y-1">
-              <div className="h-48 overflow-hidden">
-                <img 
-                  src={`https://images.unsplash.com/photo-${quiz.id}?auto=format&fit=crop&q=80&w=800`}
-                  alt={quiz.title}
-                  className="w-full h-full object-cover"
-                />
+              <div className="h-4 overflow-hidden">
+               
               </div>
-              <div className="p-6">
+              <div className="p-4">
                 <h3 className="text-xl font-semibold text-green-800 mb-3">{quiz.title}</h3>
                 <p className="text-gray-600 mb-4">{quiz.description}</p>
                 <button 
-                  onClick={() => navigate(`/quiz/${category}/${quiz.id}`)}
+                  onClick={() => navigate(`/quiz/${theme}/${quiz.id}`)}
                   className="mt-4 w-full bg-green-600 text-white py-2 px-4 rounded-md hover:bg-green-700 transition-colors"
                 >
                   Iniciar Quiz
                 </button>
               </div>
             </div>
-          ))}
+          )})}
         </div>
       </div>
     </div>

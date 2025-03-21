@@ -40,7 +40,7 @@ function Navbar({ isAuthenticated }: NavBarProps) {
             <NavLink to="/ranking" active={location.pathname === "/ranking"}>
               Ranking
             </NavLink>
-            {/* {isAuthenticated ? (
+            {isAuthenticated ? (
               <>
                 <Link
                   to="/profile"
@@ -51,7 +51,7 @@ function Navbar({ isAuthenticated }: NavBarProps) {
                 </Link>
               </>
             ) : (
-              <> */}
+              <>
                 <Link
                   to="/login"
                   className="flex items-center space-x-2 text-white hover:text-green-200 transition-colors"
@@ -59,8 +59,8 @@ function Navbar({ isAuthenticated }: NavBarProps) {
                   <User size={20} />
                   <span>Login</span>
                 </Link>
-              {/* </>
-            )} */}
+               </>
+            )} 
           </div>
         </div>
       </div>

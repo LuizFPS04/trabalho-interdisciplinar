@@ -1,14 +1,71 @@
-import React, { useState } from 'react';
+import React, { useContext, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Leaf, Mail, Lock } from 'lucide-react';
 import axios from 'axios';
+import { UserContext } from '../contexts/User';
 
-function LoginPage() {
+type LoginProps = {
+  isUserLogged: (headers: any) => void;
+}
+
+function LoginPage({ isUserLogged }: LoginProps) {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [loading, setLoading] = useState(false); // Estado para controlar o loading
+  const userContext = useContext(UserContext);
+  let token;
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const login = async (email: string, password: string) => {
+    const userLogin = {
+      email,
+      password,
+    };
+
+    setLoading(true); // Ativa o estado de loading
+
+    try {
+      const response = await axios.post(
+        "https://biogenius.onrender.com/api/v1/login",
+        userLogin,
+        {
+          headers: {
+            "Content-Type": "application/json",
+          },
+          withCredentials: true,
+        },
+      );
+
+      if (response.status === 200 || response.status === 201) {
+        const userId = response.data.id;
+
+        const findUser = await axios.get(`https://biogenius.onrender.com/api/v1/user/${userId}`, {
+          withCredentials: true
+        });
+
+        if (!userContext?.hasUserLogged() && findUser && findUser.data.data) {
+          userContext?.setUser(findUser.data.data);
+          isUserLogged(true);
+        }
+
+      } else {
+        alert(response.data.message);
+      }
+    } catch (error) {
+      if (axios.isAxiosError(error)) {
+        console.error("Erro ao logar:", error.response?.data?.message || error.message);
+        alert(`Erro: ${error.response?.data?.message || "Erro ao conectar com o servidor."}`);
+      } else {
+        console.error("Erro desconhecido:", error);
+        alert("Erro desconhecido ao conectar com o servidor.");
+      }
+    } finally {
+      setLoading(false); // Desativa o estado de loading
+    }
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    await login(email, password);
   };
 
   return (
@@ -81,8 +138,35 @@ function LoginPage() {
           <button
             type="submit"
             className="w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 transition-colors"
+            disabled={loading} // Desabilita o botão enquanto loading for true
           >
-            Entrar
+            {loading ? (
+              <div className="flex items-center">
+                <svg
+                  className="animate-spin h-5 w-5 mr-3 text-white"
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                >
+                  <circle
+                    className="opacity-25"
+                    cx="12"
+                    cy="12"
+                    r="10"
+                    stroke="currentColor"
+                    strokeWidth="4"
+                  ></circle>
+                  <path
+                    className="opacity-75"
+                    fill="currentColor"
+                    d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                  ></path>
+                </svg>
+                Carregando...
+              </div>
+            ) : (
+              "Entrar"
+            )}
           </button>
         </form>
       </div>

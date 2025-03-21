@@ -1,4 +1,4 @@
-import { Result } from "express-validator";
+import { Result } from "./resultType";
 import { Quiz } from "./quizType";
 import { Ranking } from "./rankingType";
 
@@ -10,10 +10,10 @@ export interface User {
   name: string;
   birth: Date;
   role?: string | null;
-  createdAt?: Date | null;
-  updatedAt?: Date | null;
+  createdAt?: string;
+  updatedAt?: string;
   quizzes?: Quiz[];
-  results?: Result[];
+  results?: any;
   rankings?: Ranking[];
 };
 

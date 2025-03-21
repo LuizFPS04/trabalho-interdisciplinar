@@ -1,20 +1,24 @@
 import React, { useContext, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { Leaf, Mail, Lock, User, Calendar } from "lucide-react";
+import { Leaf } from "lucide-react";
 import { UserContext } from "../contexts/User";
 import { User as UserType } from "../../backend/types/userType";
+import axios from "axios"; // Importando o Axios
+
 type RegisterPageProps = {
-  onRegister: (headers: any) => void;
+  onRegister: (headers:any) => void;
 };
+
 function RegisterPage({ onRegister }: RegisterPageProps) {
   const [name, setName] = useState("");
   const [birth, setBirth] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
-  const userContext = useContext(UserContext); // Aqui pegando diretamente
+  const [loading, setLoading] = useState(false); // Estado para controlar o loading
+  const userContext = useContext(UserContext);
   const navigate = useNavigate();
-  
+
   const validateEmail = (email: string) => {
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     return emailRegex.test(email);
@@ -51,32 +55,40 @@ function RegisterPage({ onRegister }: RegisterPageProps) {
       nickname: nickname[0],
     };
 
+    setLoading(true); 
+
     try {
-      const response = await fetch(
+      const response = await axios.post(
         "https://biogenius.onrender.com/api/v1/user",
+        userData,
         {
-          method: "POST",
           headers: {
             "Content-Type": "application/json",
           },
-          body: JSON.stringify(userData),
         }
       );
 
-      const data = await response.json();
-      console.log(data);
-      if (response.ok) {
-        onRegister(data.headers);
+      const data = response.data; 
+      if (response.status === 200 || response.status === 201) {
         const registeredUser: UserType = data.data;
-        userContext?.setUser(registeredUser)
+        console.log(registeredUser);
+        userContext?.setUser(registeredUser);
 
+       onRegister(true);
 
       } else {
         alert(`Erro: ${data.message}`);
       }
     } catch (error) {
-      console.error("Erro ao criar conta:", error);
-      alert("Erro ao conectar com o servidor.");
+      if (axios.isAxiosError(error)) {
+        console.error("Erro ao criar conta:", error.response?.data?.message || error.message);
+        alert(`Erro: ${error.response?.data?.message || "Erro ao conectar com o servidor."}`);
+      } else {
+        console.error("Erro desconhecido:", error);
+        alert("Erro desconhecido ao conectar com o servidor.");
+      }
+    } finally {
+      setLoading(false); // Desativa o estado de loading
     }
   };
 
@@ -122,7 +134,6 @@ function RegisterPage({ onRegister }: RegisterPageProps) {
                     value={name}
                     onChange={(e) => setName(e.target.value)}
                     className="appearance-none relative block w-full px-3 py-2 border border-gray-300 text-gray-900  rounded-md focus:outline-none focus:ring-green-500 focus:border-green-500 sm:text-sm"
-                   
                   />
                 </div>
               </div>
@@ -160,7 +171,6 @@ function RegisterPage({ onRegister }: RegisterPageProps) {
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                     className="appearance-none relative block w-full px-3 py-2 border border-gray-300 text-gray-900  rounded-md focus:outline-none focus:ring-green-500 focus:border-green-500 sm:text-sm"
-                  
                   />
                 </div>
               </div>
@@ -179,7 +189,6 @@ function RegisterPage({ onRegister }: RegisterPageProps) {
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
                     className="appearance-none relative block w-full px-3 py-2 border border-gray-300 text-gray-900  rounded-md focus:outline-none focus:ring-green-500 focus:border-green-500 sm:text-sm"
-                 
                   />
                 </div>
               </div>
@@ -198,7 +207,6 @@ function RegisterPage({ onRegister }: RegisterPageProps) {
                     value={confirmPassword}
                     onChange={(e) => setConfirmPassword(e.target.value)}
                     className="appearance-none relative block w-full px-3 py-2 border border-gray-300 text-gray-900  rounded-md focus:outline-none focus:ring-green-500 focus:border-green-500 sm:text-sm"
-                    
                   />
                 </div>
               </div>
@@ -208,8 +216,35 @@ function RegisterPage({ onRegister }: RegisterPageProps) {
             <button
               type="submit"
               className="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500"
+              disabled={loading} // Desabilita o botão enquanto loading for true
             >
-              Criar conta
+              {loading ? (
+                <div className="flex items-center">
+                  <svg
+                    className="animate-spin h-5 w-5 mr-3 text-white"
+                    xmlns="http://www.w3.org/2000/svg"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                  >
+                    <circle
+                      className="opacity-25"
+                      cx="12"
+                      cy="12"
+                      r="10"
+                      stroke="currentColor"
+                      strokeWidth="4"
+                    ></circle>
+                    <path
+                      className="opacity-75"
+                      fill="currentColor"
+                      d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                    ></path>
+                  </svg>
+                  Carregando...
+                </div>
+              ) : (
+                "Criar conta"
+              )}
             </button>
           </form>
         </div>

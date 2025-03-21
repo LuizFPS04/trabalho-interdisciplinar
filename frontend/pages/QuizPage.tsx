@@ -1,155 +1,26 @@
-import React, { useState } from 'react';
+import React, { useContext, useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { ArrowLeft } from 'lucide-react';
-import { Question, Result, User } from '../types';
+import { Question } from '../../backend/types/quizType';
+import {Result} from "../../backend/types/resultType"
+import { UserContext } from '../contexts/User';
+import { QuizContext } from '../contexts/Quiz';
+import axios from 'axios';
 
 function QuizPage() {
-  const { category, quizId } = useParams();
+  const { theme, quizId } = useParams();
   const navigate = useNavigate();
   const [currentQuestion, setCurrentQuestion] = useState(0);
   const [selectedAnswer, setSelectedAnswer] = useState<number | null>(null);
   const [score, setScore] = useState(0);
   const [showResult, setShowResult] = useState(false);
-
-  // Mock user data - will be replaced with actual user data from backend
-  const user: User = {
-    id: 1,
-    nickname: "JohnDoe",
-    email: "john@example.com",
-    password: "",
-    name: "John Doe",
-    birth: new Date('1990-01-01'),
-    role: "user",
-    createdAt: new Date('2024-01-01'),
-    results: []
-  };
-
-  // Example questions - in a real app, these would come from a database
-  const questions: Question[] = [
-    {
-      id: 1,
-      content: "Qual é a principal característica da Mata Atlântica?",
-      createdAt: new Date(),
-      updatedAt: new Date(),
-      quizId: 1,
-      answers: [
-        {
-          id: 1,
-          content: "Alta biodiversidade",
-          isCorrect: true,
-          createdAt: new Date(),
-          updatedAt: new Date(),
-          questionId: 1
-        },
-        {
-          id: 2,
-          content: "Clima árido",
-          isCorrect: false,
-          createdAt: new Date(),
-          updatedAt: new Date(),
-          questionId: 1
-        },
-        {
-          id: 3,
-          content: "Vegetação rasteira",
-          isCorrect: false,
-          createdAt: new Date(),
-          updatedAt: new Date(),
-          questionId: 1
-        },
-        {
-          id: 4,
-          content: "Baixa pluviosidade",
-          isCorrect: false,
-          createdAt: new Date(),
-          updatedAt: new Date(),
-          questionId: 1
-        }
-      ]
-    },
-    {
-      id: 2,
-      content: "Qual destes animais é nativo da Mata Atlântica?",
-      createdAt: new Date(),
-      updatedAt: new Date(),
-      quizId: 1,
-      answers: [
-        {
-          id: 5,
-          content: "Leão",
-          isCorrect: false,
-          createdAt: new Date(),
-          updatedAt: new Date(),
-          questionId: 2
-        },
-        {
-          id: 6,
-          content: "Mico-leão-dourado",
-          isCorrect: true,
-          createdAt: new Date(),
-          updatedAt: new Date(),
-          questionId: 2
-        },
-        {
-          id: 7,
-          content: "Girafa",
-          isCorrect: false,
-          createdAt: new Date(),
-          updatedAt: new Date(),
-          questionId: 2
-        },
-        {
-          id: 8,
-          content: "Zebra",
-          isCorrect: false,
-          createdAt: new Date(),
-          updatedAt: new Date(),
-          questionId: 2
-        }
-      ]
-    },
-    {
-      id: 3,
-      content: "Qual a porcentagem aproximada de Mata Atlântica que resta no Brasil?",
-      createdAt: new Date(),
-      updatedAt: new Date(),
-      quizId: 1,
-      answers: [
-        {
-          id: 9,
-          content: "7%",
-          isCorrect: false,
-          createdAt: new Date(),
-          updatedAt: new Date(),
-          questionId: 3
-        },
-        {
-          id: 10,
-          content: "12.4%",
-          isCorrect: true,
-          createdAt: new Date(),
-          updatedAt: new Date(),
-          questionId: 3
-        },
-        {
-          id: 11,
-          content: "28.6%",
-          isCorrect: false,
-          createdAt: new Date(),
-          updatedAt: new Date(),
-          questionId: 3
-        },
-        {
-          id: 12,
-          content: "45.2%",
-          isCorrect: false,
-          createdAt: new Date(),
-          updatedAt: new Date(),
-          questionId: 3
-        }
-      ]
-    }
-  ];
+  const userContext = useContext(UserContext);
+  const quizContext = useContext(QuizContext);
+  const quiz = quizContext?.quizzes;
+  const user = userContext?.user;
+  const filteredQuiz = Array.isArray(quiz) && quiz.find(quiz => quiz.id == quizId);
+  const questions = filteredQuiz?.questions ?? [];
+  const [result, setResult] = useState<any>(null);
 
   const handleAnswerSelect = (answerIndex: number) => {
     setSelectedAnswer(answerIndex);
@@ -168,34 +39,84 @@ function QuizPage() {
       setSelectedAnswer(null);
     } else {
       setShowResult(true);
-      // Here we would update the user's score in the backend
-      const newResult: Result = {
-        id: Math.random(), // This would be generated by the backend
-        score: score,
-        createdAt: new Date(),
-        updatedAt: new Date(),
-        user: user,
-        quiz: {
-          id: Number(quizId),
-          title: "Quiz Title", // This would come from the backend
-          theme: category || "",
-          description: "Quiz Description", // This would come from the backend
-          createdAt: new Date(),
-          updatedAt: new Date(),
-        }
-      };
-      
-      // In a real app, this would be an API call to update the user's score
-      console.log('Updating user score with result:', newResult);
     }
   };
 
   const handleExitQuiz = () => {
     const confirmExit = window.confirm('Tem certeza que deseja sair? Seu progresso será perdido.');
     if (confirmExit) {
-      navigate(`/quizzes/${category}`);
+      navigate(`/quizzes/${theme}`);
     }
   };
+
+  const postResult = async (result: any) => {
+    try {
+      const response = await axios.post(
+        "https://biogenius.onrender.com/api/v1/result",
+        result,
+        {
+          headers: {
+            "Content-Type": "application/json",
+          },
+        }
+      );
+
+      const data = response.data; 
+      if (response.status === 200 || response.status === 201) {
+        console.log("Resultado guardado", data);
+      } else {
+        alert(`Erro: ${data.message}`);
+      }
+    } catch (error) {
+      if (axios.isAxiosError(error)) {
+        console.error("Erro ao criar conta:", error.response?.data?.message || error.message);
+        alert(`Erro: ${error.response?.data?.message || "Erro ao conectar com o servidor."}`);
+      } else {
+        console.error("Erro desconhecido:", error);
+        alert("Erro desconhecido ao conectar com o servidor.");
+      }
+    } 
+  };
+
+  const refreshUser = async () => {
+    try {
+      const response = await axios.get(`https://biogenius.onrender.com/api/v1/user/${user?.id ?? ""}`, {
+        withCredentials: true
+      });
+
+      if (response.status === 200 || response.status === 201) {
+        const data = response.data.data;
+
+        if (data) {
+          userContext?.setUser(data);
+        }
+
+      } else {
+        alert(response.data.message);
+      }
+    } catch (error) {
+      if (axios.isAxiosError(error)) {
+        console.error("Erro ao logar:", error.response?.data?.message || error.message);
+        alert(`Erro: ${error.response?.data?.message || "Erro ao conectar com o servidor."}`);
+      } else {
+        console.error("Erro desconhecido:", error);
+        alert("Erro desconhecido ao conectar com o servidor.");
+      }
+    } 
+  };
+
+  useEffect(() => {
+    if (showResult) {
+      const newResult = {
+        userId: user?.id,
+        score: score,
+        quizId: parseInt(quizId ?? "")
+      };
+      setResult(newResult);
+      postResult(newResult);
+      refreshUser();
+    }
+  }, [showResult]);
 
   if (showResult) {
     return (
@@ -217,10 +138,10 @@ function QuizPage() {
                 Ver Perfil
               </button>
               <button
-                onClick={() => navigate('/')}
+                onClick={() => navigate(`/quizzes/${theme}`)}
                 className="w-full bg-white border border-green-600 text-green-600 py-3 px-6 rounded-md hover:bg-green-50 transition-colors"
               >
-                Voltar para Início
+                Voltar para lista de quizzes
               </button>
             </div>
           </div>
@@ -233,7 +154,7 @@ function QuizPage() {
 
   return (
     <div className="container mx-auto px-4 py-8">
-      <div className="bg-green-800/50 rounded-lg p-8 backdrop-blur-sm max-w-2xl mx-auto">
+       <div className="bg-green-800/50 rounded-lg p-8 backdrop-blur-sm max-w-2xl mx-auto">
         <div className="flex justify-between items-center mb-6">
           <div className="flex items-center space-x-4">
             <button
